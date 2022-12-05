@@ -2,9 +2,8 @@ package hotelREST.models;
 
 import jdk.jfr.Enabled;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 public class Offre {
@@ -18,8 +17,11 @@ public class Offre {
     @ManyToOne(targetEntity=Chambre.class)
     private Chambre chambre;
 
-    @ManyToOne(targetEntity=DateInterval.class)
-    private DateInterval dateInterval;
+//    @OneToOne(targetEntity=DateInterval.class,  cascade= CascadeType.ALL)
+//    private DateInterval dateInterval;
+
+    private String d1;
+    private String d2;
 
     private float prix;
 
@@ -37,7 +39,18 @@ public class Offre {
         this.OffreID = OffreID;
         this.idPartenaire = idPartenaire;
         this.chambre = chambre;
-        this.dateInterval = dateInterval;
+        //this.dateInterval = dateInterval;
+        this.prix = prix;
+        this.disponible = true;
+        this.nbPersonnes = nbPersonnes;
+    }
+
+    public Offre(long OffreID, String idPartenaire, Chambre chambre, String d1, String d2, float prix, int nbPersonnes){
+        this.OffreID = OffreID;
+        this.idPartenaire = idPartenaire;
+        this.chambre = chambre;
+        this.d1 = d1;
+        this.d2 = d2;
         this.prix = prix;
         this.disponible = true;
         this.nbPersonnes = nbPersonnes;
@@ -48,9 +61,9 @@ public class Offre {
         return OffreID;
     }
 
-    public DateInterval getDateInterval() {
-        return dateInterval;
-    }
+//    public DateInterval getDateInterval() {
+//        return dateInterval;
+//    }
 
     public float getPrix() {
         return prix;
@@ -76,9 +89,9 @@ public class Offre {
         this.idPartenaire = idPartenaire;
     }
 
-    public void setDateInterval(DateInterval dateInterval) {
-        this.dateInterval = dateInterval;
-    }
+//    public void setDateInterval(DateInterval dateInterval) {
+//        this.dateInterval = dateInterval;
+//    }
 
     public void setPrix(float prix) {
         this.prix = prix;
@@ -96,8 +109,11 @@ public class Offre {
         return this.idPartenaire.equals(idPartenaire);
     }
 
+//    public String toString(){
+//        return "Offre n°" + this.OffreID + " : " + this.chambre.toString() + " du " + this.dateInterval.getStartDate() + " au " + this.dateInterval.getEndDate() + " pour " + this.prix + "€";
+//    }
     public String toString(){
-        return "Offre n°" + this.OffreID + " : " + this.chambre.toString() + " du " + this.dateInterval.getStartDate() + " au " + this.dateInterval.getEndDate() + " pour " + this.prix + "€";
+        return "Offre n°" + this.OffreID + " : " + this.chambre.toString() + " du " + this.d1 + " au " + this.d2 + " pour " + this.prix + "€";
     }
 
     public int getNbPersonnes() {

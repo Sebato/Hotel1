@@ -75,6 +75,10 @@ public class Chambre {
         return this.prix_Nuit*dateSejour.nbNuits();
     }
 
+    public float getPrixSejour(int dateSejour){
+        return this.prix_Nuit*dateSejour;
+    }
+
     public float getPrixSejour(String dateArrivee, String dateDepart) throws ParseException {
         int duréeSejour = new DateInterval(dateArrivee, dateDepart).nbNuits();
 

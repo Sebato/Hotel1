@@ -47,8 +47,8 @@ public class Hotel {
         this.chambres = new ArrayList<Chambre>();
         this.reservations = new ArrayList<Reservation>();
 
-//        this.partenaires = new List<Partenaire>();
-//        this.offres = new List<Offre>();
+        this.partenaires = new ArrayList<Partenaire>();
+        this.offres = new ArrayList<Offre>();
     }
 
     //CONSTRUCTEUR AVEC ID
@@ -109,6 +109,18 @@ public class Hotel {
         return true;
     }
 
+    public boolean Est_Libre(Chambre chambre, String date1, String date2 ) throws ParseException {
+        Date d1 = new SimpleDateFormat("dd-MM-yyyy").parse(date1);
+        Date d2 = new SimpleDateFormat("dd-MM-yyyy").parse(date2);
+        for (Reservation reservation : this.reservations)
+        {
+            if (reservation.ChambreCheck(chambre,d1,d2)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
 
 
@@ -150,36 +162,47 @@ public class Hotel {
             throws WrongCredentialsException, PartenaireNotFoundException, ParseException {
         Partenaire partenaire = findPartenaire(identifiant);
         if(partenaire.checkMotDePasse(motDePasse)) {
-            return getOffresPartenaireValide(new DateInterval(date_arrivee, date_depart) , nb_personnes, partenaire);
+            return getOffresPartenaireValide(date_arrivee, date_depart , nb_personnes, partenaire);
         } else {
             throw new WrongCredentialsException();
         }
     }
 
-    public List<Offre> getOffresPartenaireValide(DateInterval dateOffre, int nbPersonnes, Partenaire partenaire){
+    public List<Offre> getOffresPartenaireValide(String date_arrivee, String date_depart, int nbPersonnes, Partenaire partenaire) throws ParseException {
         List<Offre> offres = new ArrayList<Offre>();
 
         for( Chambre chambre : this.chambres) {
-            if (Est_Libre(chambre, dateOffre.getStartDate(), dateOffre.getEndDate()) &&
+            if (Est_Libre(chambre, date_arrivee, date_depart) &&
                     (chambre.getNb_Places() >= nbPersonnes)) {
 
-                Offre e = new Offre(nextOfferIdAvailable(),
+                long offreId = nextOfferIdAvailable();
+//                DateInterval dateOffre = new DateInterval(offreId, date_arrivee, date_depart);
+                Offre e = new Offre(offreId,
                         partenaire.getIdentifiant(),
                         chambre,
-                        dateOffre,
-                        chambre.getPrixSejour(dateOffre) * partenaire.getPourcentage(),
+                        date_depart,
+                        date_arrivee,
+                        chambre.getPrixSejour(calculDuree(date_depart,date_arrivee)) * partenaire.getPourcentage(),
                         nbPersonnes);
-                this.offres.add(e);
+                this.addOffre(e);
                 offres.add(e);
             }
+        }
+        System.err.println("getOffresPartenaireValide : " + offres.size()
+                + " offres trouvées pour le partenaire " + partenaire.getIdentifiant()
+                + "\npour la période du " + date_arrivee + " au " + date_depart
+                + " pour " + nbPersonnes + " personnes: \n");
+
+        for (Offre offre : offres) {
+            System.err.println("\n"+offre);
         }
 
         return offres;
     }
 
-    public int nextOfferIdAvailable()
+    public long nextOfferIdAvailable()
     {
-        return this.offres.size();
+        return this.offres.size()+1;
     }
 
     public String toString(){
@@ -299,5 +322,31 @@ public class Hotel {
 
     private int nextReservationId() {
         return this.reservations.size();
+    }
+
+    public void dispOffres() {
+        System.out.println("Offres :");
+        for (Offre offre : this.offres) {
+            System.out.println(offre);
+        }
+    }
+
+    public void dispPartenaires() {
+        System.out.println("Offres :");
+        for (Partenaire partenaire : this.partenaires) {
+            System.out.println(partenaire);
+        }
+    }
+
+    public int calculDuree(Date date_debut, Date date_fin ) {
+        return (int) (date_debut.getTime() - date_fin.getTime()) / (1000 * 60 * 60 * 24);
+    }
+
+    public int calculDuree(String date_debut, String date_fin ) throws ParseException {
+        return (int) (dateConvert(date_debut).getTime() - dateConvert(date_fin).getTime()) / (1000 * 60 * 60 * 24);
+    }
+
+    public static Date dateConvert(String date) throws ParseException {
+        return new SimpleDateFormat("dd-MM-yyyy").parse(date);
     }
 }

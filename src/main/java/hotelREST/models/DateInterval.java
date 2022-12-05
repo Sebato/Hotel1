@@ -1,6 +1,7 @@
 package hotelREST.models;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -9,9 +10,10 @@ import java.util.Date;
 @Entity
 public class DateInterval {
 
+    @GeneratedValue
+    private Long id;
     private Date startDate;
     private Date endDate;
-    private Long id;
 
     public DateInterval() {
     }
@@ -22,6 +24,12 @@ public class DateInterval {
     }
 
     public DateInterval(String startDate, String endDate) throws ParseException {
+        this.startDate = new SimpleDateFormat("dd-MM-yyyy").parse(startDate);
+        this.endDate = new SimpleDateFormat("dd-MM-yyyy").parse(endDate);
+    }
+
+    public DateInterval(long id, String startDate, String endDate) throws ParseException {
+        this.id = id;
         this.startDate = new SimpleDateFormat("dd-MM-yyyy").parse(startDate);
         this.endDate = new SimpleDateFormat("dd-MM-yyyy").parse(endDate);
     }

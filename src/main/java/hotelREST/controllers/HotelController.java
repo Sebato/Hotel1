@@ -28,6 +28,8 @@ public class HotelController {
     // INFOS HOTEL
     @GetMapping(uri+"/hotel")
     public List<Hotel> getAllHotels(){
+        Hotel h = repository.findAll().get(0);
+        h.dispOffres();
         return repository.findAll();
     }
 
@@ -39,18 +41,18 @@ public class HotelController {
     }
 
     //CHAMBRES DISPONIBLES POUR UN INTERVALLE DE DATE ET UN NB DE CLIENTS
-    @GetMapping(uri+"/hotel/chambres_dispo")
-    public List<Chambre> getChambres_Disponibles(@RequestParam String date1, @RequestParam String date2, @RequestParam int nbclients) throws HotelNotFoundException, ParseException {
-        return repository.findAll().get(0).getChambresLibres(date1, date2, nbclients);
-    }
+//    @GetMapping(uri+"/hotel/chambres_dispo")
+//    public List<Chambre> getChambres_Disponibles(@RequestParam String date1, @RequestParam String date2, @RequestParam int nbclients) throws HotelNotFoundException, ParseException {
+//        return repository.findAll().get(0).getChambresLibres(date1, date2, nbclients);
+//    }
 
     //CHAMBRES DISPONIBLES POUR UNE RECHERCHE AVANCÉE
     @GetMapping(uri+"/hotel/chambres_dispo")
     public List<Chambre> recherche_Chambre(@RequestParam String date1,
                                            @RequestParam String date2,
+                                           @RequestParam Integer nbClients,
                                            @RequestParam(required = false) String ville,
                                            @RequestParam(required = false) Integer nbEtoiles,
-                                           @RequestParam(required = false) Integer nbClients,
                                            @RequestParam(required = false) Float prixMin,
                                            @RequestParam(required = false) Float prixMax)
             throws HotelNotFoundException, ParseException {
@@ -80,11 +82,8 @@ public class HotelController {
             throws PartenaireNotFoundException, ParseException, WrongCredentialsException {
 
         Hotel hotel = repository.findAll().get(0);
-        List<Offre> offres = new ArrayList<Offre>();
 
-            offres.addAll(hotel.getOffres(Idagence, Mdpagence, date1, date2, nbClients));
-
-        return offres;
+        return new ArrayList<Offre>(hotel.getOffres(Idagence, Mdpagence, date1, date2, nbClients));
     }
 
     @PostMapping(uri+"/hotel")
