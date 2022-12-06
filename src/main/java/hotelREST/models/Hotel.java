@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
 
-@Entity
+@Entity(name = "Hotel")
+@Table(name = "Hotel")
 public class Hotel {
 
     @Id
@@ -98,8 +99,7 @@ public class Hotel {
         return chambresLibres;
     }
 
-    public boolean Est_Libre(Chambre chambre, Date date1, Date date2 )
-    {
+    public boolean Est_Libre(Chambre chambre, Date date1, Date date2 ) throws ParseException {
         for (Reservation reservation : this.reservations)
         {
             if (reservation.ChambreCheck(chambre,date1,date2)) {
@@ -169,14 +169,13 @@ public class Hotel {
     }
 
     public List<Offre> getOffresPartenaireValide(String date_arrivee, String date_depart, int nbPersonnes, Partenaire partenaire) throws ParseException {
-        List<Offre> offres = new ArrayList<Offre>();
+        List<Offre>offresGen = new ArrayList<Offre>();
 
         for( Chambre chambre : this.chambres) {
-            if (Est_Libre(chambre, date_arrivee, date_depart) &&
-                    (chambre.getNb_Places() >= nbPersonnes)) {
+            if ((chambre.getNb_Places() >= nbPersonnes) &&
+                    Est_Libre(chambre, date_arrivee, date_depart) ) {
 
                 long offreId = nextOfferIdAvailable();
-//                DateInterval dateOffre = new DateInterval(offreId, date_arrivee, date_depart);
                 Offre e = new Offre(offreId,
                         partenaire.getIdentifiant(),
                         chambre,
@@ -184,20 +183,22 @@ public class Hotel {
                         date_arrivee,
                         chambre.getPrixSejour(calculDuree(date_depart,date_arrivee)) * partenaire.getPourcentage(),
                         nbPersonnes);
-                this.addOffre(e);
-                offres.add(e);
+               offresGen.add(e);
             }
         }
-        System.err.println("getOffresPartenaireValide : " + offres.size()
-                + " offres trouvées pour le partenaire " + partenaire.getIdentifiant()
-                + "\npour la période du " + date_arrivee + " au " + date_depart
-                + " pour " + nbPersonnes + " personnes: \n");
+//        System.err.println("getOffresPartenaireValide : " + offresGen.size()
+//                + " offresGen trouvées pour le partenaire " + partenaire.getIdentifiant()
+//                + "\npour la période du " + date_arrivee + " au " + date_depart
+//                + " pour " + nbPersonnes + " personnes: \n");
 
-        for (Offre offre : offres) {
+        for (Offre offre : offresGen) {
             System.err.println("\n"+offre);
         }
+        this.offres.addAll(offresGen);
 
-        return offres;
+        this.dispOffres();
+
+        return offresGen;
     }
 
     public long nextOfferIdAvailable()

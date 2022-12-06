@@ -10,12 +10,13 @@ public class Offre {
 
 
     @Id
-    private long OffreID;
+    private long id;
 
     private String idPartenaire;
 
-    @ManyToOne(targetEntity=Chambre.class)
+    @ManyToOne
     private Chambre chambre;
+
 
 //    @OneToOne(targetEntity=DateInterval.class,  cascade= CascadeType.ALL)
 //    private DateInterval dateInterval;
@@ -36,7 +37,7 @@ public class Offre {
     }
 
     public Offre(long OffreID, String idPartenaire, Chambre chambre, DateInterval dateInterval, float prix, int nbPersonnes){
-        this.OffreID = OffreID;
+        this.id = OffreID;
         this.idPartenaire = idPartenaire;
         this.chambre = chambre;
         //this.dateInterval = dateInterval;
@@ -46,7 +47,7 @@ public class Offre {
     }
 
     public Offre(long OffreID, String idPartenaire, Chambre chambre, String d1, String d2, float prix, int nbPersonnes){
-        this.OffreID = OffreID;
+        this.id = OffreID;
         this.idPartenaire = idPartenaire;
         this.chambre = chambre;
         this.d1 = d1;
@@ -58,7 +59,7 @@ public class Offre {
 
     //GETTERS
     public long getOffreID() {
-        return OffreID;
+        return id;
     }
 
 //    public DateInterval getDateInterval() {
@@ -81,8 +82,8 @@ public class Offre {
         return chambre;
     }
 
-    public void setOffreID(int offreID) {
-        this.OffreID = offreID;
+    public void setOffreID(int id) {
+        this.id = id;
     }
 
     public void setIdPartenaire(String idPartenaire) {
@@ -109,14 +110,31 @@ public class Offre {
         return this.idPartenaire.equals(idPartenaire);
     }
 
-//    public String toString(){
-//        return "Offre n°" + this.OffreID + " : " + this.chambre.toString() + " du " + this.dateInterval.getStartDate() + " au " + this.dateInterval.getEndDate() + " pour " + this.prix + "€";
+    //    public String toString(){
+//        return "Offre n°" + this.id + " : " + this.chambre.toString() + " du " + this.dateInterval.getStartDate() + " au " + this.dateInterval.getEndDate() + " pour " + this.prix + "€";
 //    }
     public String toString(){
-        return "Offre n°" + this.OffreID + " : " + this.chambre.toString() + " du " + this.d1 + " au " + this.d2 + " pour " + this.prix + "€";
+        return "Offre n°" + this.id + " : " + this.chambre.toString() +  " du " + this.d1 + " au " + this.d2 + " pour " + this.prix + "€";
     }
 
     public int getNbPersonnes() {
         return this.nbPersonnes;
     }
+
+    public String getD1() {
+        return d1;
+    }
+
+    public String getD2() {
+        return d2;
+    }
+
+    public void setD1(String d1) {
+        this.d1 = d1;
+    }
+
+    public void setD2(String d2) {
+        this.d2 = d2;
+    }
+
 }

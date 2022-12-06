@@ -35,13 +35,16 @@ public class HotelData {
             h1.addChambre(c3);
             h1.addChambre(c4);
 
-            Partenaire p1 = new Partenaire("A0", "Partenaire1", 5);
-            Partenaire p2 = new Partenaire("A1", "Partenaire2", 4);
-            Partenaire p3 = new Partenaire("A2", "Partenaire3", 3);
+            Partenaire p1 = new Partenaire("A0", "Partenaire1", 0.5f);
+            Partenaire p2 = new Partenaire("A1", "Partenaire2", 0.4f);
+            Partenaire p3 = new Partenaire("A2", "Partenaire3", 0.3f);
 
             h1.addPartenaire(p1);
             h1.addPartenaire(p2);
 
+            Offre o1 = new Offre(1, "A0", c3, "20-01-2020", "22-01-2020", 70f, 2);
+
+            h1.addOffre(o1);
 
             logger.info("Preloading database with "
                     +repository.save(h1)

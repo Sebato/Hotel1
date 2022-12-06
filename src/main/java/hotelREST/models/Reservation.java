@@ -1,6 +1,7 @@
 package hotelREST.models;
 
 import javax.persistence.*;
+import java.text.ParseException;
 import java.util.Date;
 
 @Entity
@@ -8,10 +9,7 @@ public class Reservation {
 
     @Id
     private long reference;
-    //private Date dateDebut;
-    //private Date dateFin;
-    //private int numChambre;
-    //private int nbPersonnes;
+
     @OneToOne
     private Client client;
 
@@ -55,11 +53,11 @@ public class Reservation {
     public Client getClient() {
         return client;
     }
-    public Date getDateDebut() {
-        return this.offre.getDateInterval().getStartDate();
+    public Date getDateDebut() throws ParseException {
+        return Hotel.dateConvert(this.offre.getD1());
     }
-    public Date getDateFin() {
-        return this.offre.getDateInterval().getEndDate();
+    public Date getDateFin() throws ParseException {
+        return Hotel.dateConvert(this.offre.getD2());
     }
     public int getNumChambre() {
         return this.offre.getChambre().getNumero();
@@ -71,8 +69,7 @@ public class Reservation {
         return this.offre.getPrix();
     }
 
-    public boolean ChambreCheck(Chambre c, Date d1, Date d2)
-    {
+    public boolean ChambreCheck(Chambre c, Date d1, Date d2) throws ParseException {
         return (this.getNumChambre() == c.getNumero() &&
                 this.getDateDebut().equals(d1) &&
                 this.getDateFin().equals(d2));
