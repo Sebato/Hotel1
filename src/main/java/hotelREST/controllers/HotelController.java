@@ -1,12 +1,7 @@
 package hotelREST.controllers;
 
-import hotelREST.exceptions.HotelNotFoundException;
-import hotelREST.exceptions.PartenaireNotFoundException;
-import hotelREST.exceptions.WrongCredentialsException;
-import hotelREST.models.Chambre;
-import hotelREST.models.Hotel;
-import hotelREST.models.Offre;
-import hotelREST.models.Search;
+import hotelREST.exceptions.*;
+import hotelREST.models.*;
 import hotelREST.repositories.HotelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,17 +22,33 @@ public class HotelController {
 
     // INFOS HOTEL
     @GetMapping(uri+"/hotel")
-    public List<Hotel> getAllHotels(){
-        Hotel h = repository.findAll().get(0);
-        h.dispOffres();
-        return repository.findAll();
+    public Hotel getHotel(){
+        return repository.findAll().get(0);
     }
 
 
-    //TOUTES LES CHAMBRES HOTEL
+    //TOUTES LES CHAMBRES
     @GetMapping(uri+"/hotel/chambres")
     public List<Chambre> getChambres() throws HotelNotFoundException {
         return repository.findAll().get(0).getChambres();
+    }
+
+    //TOUS LES PARTENAIRES (RESERVÉ AU DEBUG)
+    @GetMapping(uri+"/partenaires")
+    public List<Partenaire> getPartenaires() throws HotelNotFoundException {
+        return repository.findAll().get(0).getPartenaires();
+    }
+
+    //TOUTES LES OFFRES (RESERVÉ AU DEBUG)
+    @GetMapping(uri+"/offres")
+    public List<Offre> getOffres() throws HotelNotFoundException {
+        return repository.findAll().get(0).getOffres();
+    }
+
+    //TOUTES LES RESERVATIONS (RESERVÉ AU DEBUG)
+    @GetMapping(uri+"/reservations")
+    public List<Reservation> getReservations() throws HotelNotFoundException {
+        return repository.findAll().get(0).getReservations();
     }
 
     //CHAMBRES DISPONIBLES POUR UN INTERVALLE DE DATE ET UN NB DE CLIENTS
@@ -82,13 +93,29 @@ public class HotelController {
             throws PartenaireNotFoundException, ParseException, WrongCredentialsException {
 
         Hotel hotel = repository.findAll().get(0);
+        List<Offre> offresGen;
+        offresGen = hotel.getOffres(Idagence, Mdpagence, date1, date2, nbClients);
+        repository.save(hotel);
 
-        return new ArrayList<Offre>(hotel.getOffres(Idagence, Mdpagence, date1, date2, nbClients));
+        System.err.println("\nrepository saved\n");
+
+        return offresGen;
     }
 
-    @PostMapping(uri+"/hotel")
-    public Hotel createHotel(@RequestBody Hotel hotel) {
-        return repository.save(hotel);
+    @PostMapping(uri+"/reservation")
+    public Reservation reservation(@RequestParam String Idagence,
+                            @RequestParam String Mdpagence,
+                            @RequestParam int OffreId,
+                            @RequestParam String Client_nom,
+                            @RequestParam String Client_prenom)
+            throws PartenaireNotFoundException, WrongAgencyException,
+            WrongCredentialsException, OfferNotFoundException, AlreadyBookedException, OverlapException, ParseException, YOUDIDSHITBROException {
+
+        Hotel hotel = repository.findAll().get(0);
+        Reservation res = hotel.reserver(Idagence, Mdpagence, OffreId, Client_nom, Client_prenom);
+        repository.save(hotel);
+        System.err.println("\nrepository saved\n");
+        return res;
     }
 
     @PutMapping(uri+"/hotel/{id}")
@@ -102,6 +129,7 @@ public class HotelController {
                     return repository.save(hotel);
                 })
                 .orElseGet(() -> repository.save(newHotel));
+
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)

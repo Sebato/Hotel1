@@ -10,10 +10,12 @@ public class Reservation {
     @Id
     private long reference;
 
-    @OneToOne
-    private Client client;
 
-    @OneToOne
+    private String client_nom;
+
+    private String client_prenom;
+
+    @OneToOne (cascade = CascadeType.ALL)
     private Offre offre;
 
 
@@ -31,9 +33,10 @@ public class Reservation {
 //    }
 
     //reservation normale V2
-    public Reservation(long ref, Offre offre, Client client) {
+    public Reservation(long ref, Offre offre, String client_nom, String client_prenom) {
         this.reference = ref;
-        this.client = client;
+        this.client_nom = client_nom;
+        this.client_prenom = client_prenom;
         this.offre = offre;
     }
 
@@ -50,9 +53,7 @@ public class Reservation {
     public long getId() {
         return reference;
     }
-    public Client getClient() {
-        return client;
-    }
+
     public Date getDateDebut() throws ParseException {
         return Hotel.dateConvert(this.offre.getD1());
     }
@@ -69,10 +70,27 @@ public class Reservation {
         return this.offre.getPrix();
     }
 
+    public Offre getOffre() {
+        return offre;
+    }
+
+    public void setOffre(Offre offre) {
+        this.offre = offre;
+    }
+
     public boolean ChambreCheck(Chambre c, Date d1, Date d2) throws ParseException {
         return (this.getNumChambre() == c.getNumero() &&
                 this.getDateDebut().equals(d1) &&
                 this.getDateFin().equals(d2));
     }
 
+    @Override
+    public String toString() {
+        return "Reservation{" +
+                "reference=" + reference +
+                ", client_nom='" + client_nom + '\'' +
+                ", client_prenom='" + client_prenom + '\'' +
+                ", offre=" + offre +
+                '}';
+    }
 }

@@ -7,10 +7,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-@Entity
 public class DateInterval {
 
-    @GeneratedValue
     private Long id;
     private Date startDate;
     private Date endDate;
@@ -71,7 +69,6 @@ public class DateInterval {
         this.id = id;
     }
 
-    @Id
     public Long getId() {
         return id;
     }

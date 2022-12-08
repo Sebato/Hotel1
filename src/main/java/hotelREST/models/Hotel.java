@@ -3,6 +3,7 @@ package hotelREST.models;
 import hotelREST.exceptions.*;
 
 import javax.persistence.*;
+import java.sql.SQLOutput;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -149,7 +150,7 @@ public class Hotel {
 
 
     public Partenaire findPartenaire(String identifiant) throws PartenaireNotFoundException {
-        System.err.println("findPartenaire : " + identifiant);
+        //System.err.println("findPartenaire : " + identifiant);
         for (Partenaire partenaire : this.partenaires) {
             if (partenaire.getIdentifiant().equals(identifiant)) {
                 return partenaire;
@@ -179,11 +180,12 @@ public class Hotel {
                 Offre e = new Offre(offreId,
                         partenaire.getIdentifiant(),
                         chambre,
-                        date_depart,
                         date_arrivee,
+                        date_depart,
                         chambre.getPrixSejour(calculDuree(date_depart,date_arrivee)) * partenaire.getPourcentage(),
                         nbPersonnes);
-               offresGen.add(e);
+                offresGen.add(e);
+                this.addOffre(e);
             }
         }
 //        System.err.println("getOffresPartenaireValide : " + offresGen.size()
@@ -191,24 +193,20 @@ public class Hotel {
 //                + "\npour la période du " + date_arrivee + " au " + date_depart
 //                + " pour " + nbPersonnes + " personnes: \n");
 
-        for (Offre offre : offresGen) {
-            System.err.println("\n"+offre);
-        }
-        this.offres.addAll(offresGen);
 
         this.dispOffres();
 
         return offresGen;
     }
 
-    public long nextOfferIdAvailable()
-    {
-        return this.offres.size()+1;
+    public long nextOfferIdAvailable(){
+        if (this.offres.size() == 0) { return 1; }
+        else { return this.offres.get(this.offres.size() - 1).getOffreID() + 1; }
     }
 
     public String toString(){
         String hotelStr = "\n";
-        String chambresStr = "";
+        String tmpStr = "";
 
         hotelStr += "Hotel "+this.id+" : " + this.nom + "\n";
         hotelStr += "nb_Etoiles : " + this.nb_Etoiles + "\n";
@@ -217,9 +215,26 @@ public class Hotel {
 
         if (this.chambres.size() > 0) {
             for ( Chambre chambre : this.chambres ) {
-                chambresStr += "- " + chambre.toString() + "\n";
+                tmpStr = "";
+                tmpStr += "- " + chambre.toString() + "\n";
             }
-            hotelStr += "chambres : " + chambresStr + "\n";
+            hotelStr += "chambres : " + tmpStr + "\n";
+        }
+
+        if (this.offres.size() > 0) {
+            for ( Offre offre : this.offres ) {
+                tmpStr = "";
+                tmpStr += "- " + offre.toString() + "\n";
+            }
+            hotelStr += "Offres : " + tmpStr + "\n";
+        }
+
+        if (this.reservations.size() > 0) {
+            for ( Reservation reservation : this.reservations ) {
+                tmpStr = "";
+                tmpStr += "- " + reservation.toString() + "\n";
+            }
+            hotelStr += "Reservations : " + tmpStr + "\n";
         }
 
         return hotelStr;
@@ -241,7 +256,7 @@ public class Hotel {
         this.offres.add(offre);
     }
 
-    public List<Reservation> getReservation(Reservation reservation) {
+    public List<Reservation> getReservations() {
         return this.reservations;
     }
 
@@ -263,7 +278,7 @@ public class Hotel {
 
         //on cherche le partenaire
         try {
-            Partenaire partenaire = findPartenaire(identifiantAgence);
+            Partenaire p = findPartenaire(identifiantAgence);
         } catch (PartenaireNotFoundException e) {
             throw new PartenaireNotFoundException();
         }
@@ -291,42 +306,101 @@ public class Hotel {
         }
     }
 
-    public Reservation reserver(String identifiantAgence, int offreID, String nom, String prenom, String cred)
-            throws PartenaireNotFoundException, WrongAgencyException, OfferNotFoundException, AlreadyBookedException {
-        Offre offre = findOffre(identifiantAgence, offreID);
-        if (offre != null ) {
+    public Reservation reserver(String identifiantAgence, String MdpAgence, int offreID, String c_nom, String c_prenom)
+            throws PartenaireNotFoundException, WrongAgencyException, OfferNotFoundException, AlreadyBookedException,
+            WrongCredentialsException, OverlapException, ParseException, YOUDIDSHITBROException {
 
-            if (!offre.getDisponible())
-            {
-                throw new AlreadyBookedException();
+        //1. vérification de l'identité de l'agence qui demande la réservation
+
+        Partenaire partenaire = findPartenaire(identifiantAgence);
+        if(!partenaire.checkMotDePasse(MdpAgence)) {
+            throw new WrongCredentialsException();
+        }
+        else {
+
+            //2. vérification de la présence de l'offre
+
+            Offre offre = findOffre(identifiantAgence, offreID);
+            if (offre != null ) {
+
+                //3. vérification de la disponibilité de l'offre
+
+                if (!offre.getDisponible()){ throw new AlreadyBookedException(); }
+
+                //(3 bis vérification anti conflits)
+                this.disableConflictingOffers(offre);
+
+                //4. création de la réservation
+
+                long refRes = this.nextReservationId();
+                Reservation reservation = new Reservation( refRes, offre, c_nom, c_prenom);
+
+                //5. ajout de la réservation à la liste des réservations de l'hôtel
+
+                this.reservations.add(reservation);
+
+                //6. mise à jour de la disponibilité de l'offre
+
+                offre.setDisponible(false);
+
+                return reservation;
             }
 
-            //client
-            Client client = new Client(nom, prenom, cred);
-
-            //reservation
-//            Date arrivee = offre.getDateInterval().getStartDate();
-//            Date depart = offre.getDateInterval().getEndDate();
-//            Chambre chambre = offre.getChambre();
-            float prix = offre.getPrix();
-            long refRes = this.nextReservationId();
-
-            Reservation reservation = new Reservation( refRes, offre, client);
-
-            this.reservations.add(reservation);
-            offre.setDisponible(false);
-
-            return reservation;
         }
         return null;
     }
 
+    private void disableConflictingOffers(Offre offre) throws OverlapException, ParseException, YOUDIDSHITBROException {
+        System.out.println("disableConflictingOffers with offer " + offre.toString());
+
+        //liste temporaire pour éviter de modifier la liste des offres de l'hotel pendant la boucle (VERY BAD)
+        ArrayList<Offre> tmpOffres = new ArrayList<Offre>(this.offres);
+
+        for (Offre o : tmpOffres) {
+            System.out.print("\n  - offre : " + o.getOffreID());
+            if ( (!offre.equals(o)) && o.getChambre().equals(offre.getChambre())) {
+                if (o.dateConflictWith(offre)) {
+                    System.err.println("\ndisableConflictingOffers : " + o.toString()
+                            + " est en conflit avec " + offre.toString());
+                    if (o.getDisponible()) {
+//                        o.setDisponible(false); // A VOIR SI ON SUPPRIME L'OFFRE CONFLICTUELLE
+                        // (OUI) :
+                        this.deleteOffer(o);
+                        // SINON ON DOIT CHECKER TOUTES LES RESERVATIONS POUR SAVOIR SI ELLE A ETE UTILISEE PLUTOT)
+                        System.err.println("disableConflictingOffers : "
+                                + o.toStringXS() + " est désormais indisponible");
+                    }else
+                    {
+                        System.err.println("disableConflictingOffers : "
+                                + o.toStringXS() + " est déjà réservée");
+                        throw new OverlapException();
+                    }
+                }
+
+            }
+            System.out.println(" : OK");
+        }
+    }
+
+    private void deleteOffer(Offre o) throws YOUDIDSHITBROException {
+        for (Reservation r : this.reservations) {
+            if (r.getOffre().equals(o)) {
+                throw new YOUDIDSHITBROException();
+            }
+        }
+        if (this.offres.contains(o)) {
+            this.offres.remove(o);
+            System.out.println("deleteOffer : " + o.toStringXS() + " supprimée");
+        }
+    }
+
     private int nextReservationId() {
-        return this.reservations.size();
+        if (this.reservations.size() == 0) { return 1; }
+    else { return (int) (this.reservations.get(this.reservations.size() - 1).getId() + 1); }
     }
 
     public void dispOffres() {
-        System.out.println("Offres :");
+        System.out.println("toutes les Offres :");
         for (Offre offre : this.offres) {
             System.out.println(offre);
         }

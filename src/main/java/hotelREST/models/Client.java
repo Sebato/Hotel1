@@ -6,6 +6,7 @@ import javax.persistence.Id;
 @Entity
 public class Client {
 
+    @Id
     private Long id;
     private String nom;
     private String prenom;
@@ -23,7 +24,6 @@ public class Client {
         this.creditCard = creditCard;
     }
 
-    @Id
     public Long getId() {
         return id;
     }
