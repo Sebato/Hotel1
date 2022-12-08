@@ -26,7 +26,6 @@ public class HotelController {
         return repository.findAll().get(0);
     }
 
-
     //TOUTES LES CHAMBRES
     @GetMapping(uri+"/hotel/chambres")
     public List<Chambre> getChambres() throws HotelNotFoundException {
@@ -45,10 +44,22 @@ public class HotelController {
         return repository.findAll().get(0).getOffres();
     }
 
+    //TOUTES LES OFFRES POUR UNE CHAMBRE DONNEE (RESERVÉ AU DEBUG)
+    @GetMapping(uri+"/offres_chambre/{id}")
+    public List<Offre> getOffres_chambre( @PathVariable long id) {
+        return repository.findAll().get(0).getOffresChmbr(id);
+    }
+
     //TOUTES LES RESERVATIONS (RESERVÉ AU DEBUG)
     @GetMapping(uri+"/reservations")
     public List<Reservation> getReservations() throws HotelNotFoundException {
         return repository.findAll().get(0).getReservations();
+    }
+
+    //TOUTES LES RESERVATIONS POUR UNE CHAMBRE DONNEE (RESERVÉ AU DEBUG)
+    @GetMapping(uri+"/reservations_chambre/{id}")
+    public List<Reservation> getReservations_chambre( @PathVariable long id){
+        return repository.findAll().get(0).getReservations_Chmbr(id);
     }
 
     //CHAMBRES DISPONIBLES POUR UN INTERVALLE DE DATE ET UN NB DE CLIENTS
@@ -57,33 +68,33 @@ public class HotelController {
 //        return repository.findAll().get(0).getChambresLibres(date1, date2, nbclients);
 //    }
 
-    //CHAMBRES DISPONIBLES POUR UNE RECHERCHE AVANCÉE
-    @GetMapping(uri+"/hotel/chambres_dispo")
-    public List<Chambre> recherche_Chambre(@RequestParam String date1,
-                                           @RequestParam String date2,
-                                           @RequestParam Integer nbClients,
-                                           @RequestParam(required = false) String ville,
-                                           @RequestParam(required = false) Integer nbEtoiles,
-                                           @RequestParam(required = false) Float prixMin,
-                                           @RequestParam(required = false) Float prixMax)
-            throws HotelNotFoundException, ParseException {
+//    //CHAMBRES DISPONIBLES RECHERCHE AVANCÉE
+//    @GetMapping(uri+"/hotel/recherche")
+//    public List<Chambre> recherche_Chambre(@RequestParam String date1,
+//                                           @RequestParam String date2,
+//                                           @RequestParam Integer nbClients,
+//                                           @RequestParam(required = false) String ville,
+//                                           @RequestParam(required = false) Integer nbEtoiles,
+//                                           @RequestParam(required = false) Float prixMin,
+//                                           @RequestParam(required = false) Float prixMax)
+//            throws HotelNotFoundException, ParseException {
+//
+//        Search search = new Search(date1, date2, ville, nbEtoiles, nbClients, prixMin, prixMax);
+//
+//        return repository.search_room(search).orElseThrow(() -> new HotelNotFoundException(
+//                "Error: To debug\n param : " +
+//                        "\n date1 : " + date1 +
+//                        "\n date2 : " + date2 +
+//                        "\n adresse : " + ville +
+//                        "\n nbEtoiles : " + nbEtoiles +
+//                        "\n nbClients : " + nbClients +
+//                        "\n prixMin : " + prixMin +
+//                        "\n prixMax : " + prixMax));
+//    }
 
-        Search search = new Search(date1, date2, ville, nbEtoiles, nbClients, prixMin, prixMax);
+//    @ResponseStatus(HttpStatus.CREATED)
 
-        return repository.search_room(search).orElseThrow(() -> new HotelNotFoundException(
-                "Error: To debug\n param : " +
-                        "\n date1 : " + date1 +
-                        "\n date2 : " + date2 +
-                        "\n adresse : " + ville +
-                        "\n nbEtoiles : " + nbEtoiles +
-                        "\n nbClients : " + nbClients +
-                        "\n prixMin : " + prixMin +
-                        "\n prixMax : " + prixMax));
-    }
-
-    @ResponseStatus(HttpStatus.CREATED)
-
-
+    //GENERATION D'OFFRES EN ACCORD AVEC LA RECHERCHE
     @PostMapping(uri+"/hotel/recherche_offre")
     public List<Offre> recherche_Offre(@RequestParam String Idagence,
                                        @RequestParam String Mdpagence,
@@ -102,6 +113,8 @@ public class HotelController {
         return offresGen;
     }
 
+
+    //RESERVATION D'UNE OFFRE GENEREE AU PREALABLE
     @PostMapping(uri+"/reservation")
     public Reservation reservation(@RequestParam String Idagence,
                             @RequestParam String Mdpagence,
@@ -118,19 +131,19 @@ public class HotelController {
         return res;
     }
 
-    @PutMapping(uri+"/hotel/{id}")
-    public Hotel updateHotel(@RequestBody Hotel newHotel,
-                                   @PathVariable long id) {
-        return repository.findById(id)
-                .map(hotel -> {
-                    hotel.setNom(newHotel.getNom());
-                    hotel.setEtoiles(newHotel.getNb_Etoiles());
-                    hotel.setAddress(newHotel.getAdresse());
-                    return repository.save(hotel);
-                })
-                .orElseGet(() -> repository.save(newHotel));
-
-    }
+//    @PutMapping(uri+"/hotel/{id}")
+//    public Hotel updateHotel(@RequestBody Hotel newHotel,
+//                                   @PathVariable long id) {
+//        return repository.findById(id)
+//                .map(hotel -> {
+//                    hotel.setNom(newHotel.getNom());
+//                    hotel.setEtoiles(newHotel.getNb_Etoiles());
+//                    hotel.setAddress(newHotel.getAdresse());
+//                    return repository.save(hotel);
+//                })
+//                .orElseGet(() -> repository.save(newHotel));
+//
+//    }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
 

@@ -424,4 +424,24 @@ public class Hotel {
     public static Date dateConvert(String date) throws ParseException {
         return new SimpleDateFormat("dd-MM-yyyy").parse(date);
     }
+
+    public List<Offre> getOffresChmbr(long id) {
+        List<Offre> offresChmbr = new ArrayList<Offre>();
+        for (Offre o : this.offres) {
+            if (o.getChambre().getNumero() == id) {
+                offresChmbr.add(o);
+            }
+        }
+        return offresChmbr;
+    }
+
+    public List<Reservation> getReservations_Chmbr(long id) {
+        List<Reservation> reservationsChmbr = new ArrayList<Reservation>();
+        for (Reservation r : this.reservations) {
+            if (r.getOffre().getChambre().getNumero() == id) {
+                reservationsChmbr.add(r);
+            }
+        }
+        return reservationsChmbr;
+    }
 }
