@@ -21,8 +21,7 @@ public class Hotel {
 
     private int nb_Etoiles;
 
-    @OneToOne(targetEntity=Adresse.class, cascade=CascadeType.ALL)
-    private Adresse adresse;
+    private String ville;
 
     @OneToMany(targetEntity=Chambre.class, cascade=CascadeType.ALL)
     private List<Chambre> chambres;
@@ -42,10 +41,10 @@ public class Hotel {
 
 
     //CONSTRUCTEUR SANS ID
-    public Hotel(String nom, Adresse adresse, int nb_Etoiles) {
+    public Hotel(String nom, String ville, int nb_Etoiles) {
         this.nom = nom;
         this.nb_Etoiles = nb_Etoiles;
-        this.adresse = adresse;
+        this.ville = ville;
         this.chambres = new ArrayList<Chambre>();
         this.reservations = new ArrayList<Reservation>();
 
@@ -54,11 +53,11 @@ public class Hotel {
     }
 
     //CONSTRUCTEUR AVEC ID
-    public Hotel(long id, String nom, Adresse adresse, int nb_Etoiles) {
+    public Hotel(long id, String nom, String ville, int nb_Etoiles) {
         this.id = id;
         this.nom = nom;
         this.nb_Etoiles = nb_Etoiles;
-        this.adresse = adresse;
+        this.ville = ville;
         this.chambres = new ArrayList<Chambre>();
         this.reservations = new ArrayList<Reservation>();
         this.partenaires = new ArrayList<Partenaire>();
@@ -72,8 +71,8 @@ public class Hotel {
     public int getNb_Etoiles() {
         return nb_Etoiles;
     }
-    public Adresse getAdresse() {
-        return adresse;
+    public String getVille() {
+        return ville;
     }
     public List<Chambre> getChambres() {
         return this.chambres;
@@ -210,7 +209,7 @@ public class Hotel {
 
         hotelStr += "Hotel "+this.id+" : " + this.nom + "\n";
         hotelStr += "nb_Etoiles : " + this.nb_Etoiles + "\n";
-        hotelStr += "adresse : " + this.adresse.toString() + "\n";
+        hotelStr += "ville : " + this.ville + "\n";
         hotelStr += "nb_chambres : " + this.chambres.size() + "\n";
 
         if (this.chambres.size() > 0) {
@@ -248,8 +247,8 @@ public class Hotel {
         this.nb_Etoiles = nb_etoiles;
     }
 
-    public void setAddress(Adresse adresse) {
-        this.adresse = adresse;
+    public void setVille(String ville) {
+        this.ville = ville;
     }
 
     public void addOffre(Offre offre) {

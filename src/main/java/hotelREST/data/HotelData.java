@@ -16,7 +16,7 @@ public class HotelData {
     @Bean
     public CommandLineRunner initDataHotel(HotelRepository repository) {
         return args -> {
-            Adresse ad1 =  new Adresse(1,"France","Paris","rue de la paix",1,"chez moi");
+            String ville1 = "Paris";
 
             Chambre c1 = new Chambre(1,1, 25);
             Chambre c2 = new Chambre(2,2, 30);
@@ -28,7 +28,7 @@ public class HotelData {
 //            Chambre c8 = new Chambre(8,3, 80);
 //            Chambre c9 = new Chambre(9,4, 100);
 
-            Hotel h1 = new Hotel(1, "HotelTest1", ad1, 5);
+            Hotel h1 = new Hotel(1, "HotelTest1", ville1, 5);
 
             h1.addChambre(c1);
             h1.addChambre(c2);

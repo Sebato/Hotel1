@@ -32,7 +32,7 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
 
         for (Hotel h : hotels) {
             if (ville != null ) {
-                if (!h.getAdresse().getVille().equalsIgnoreCase(ville) ) {
+                if (!h.getVille().equalsIgnoreCase(ville) ) {
                     hotels_filtered.remove(h);
                 }
             };

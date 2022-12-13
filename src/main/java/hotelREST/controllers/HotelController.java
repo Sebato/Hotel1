@@ -95,7 +95,7 @@ public class HotelController {
 //    @ResponseStatus(HttpStatus.CREATED)
 
     //GENERATION D'OFFRES EN ACCORD AVEC LA RECHERCHE
-    @PostMapping(uri+"/hotel/recherche_offre")
+    @PostMapping(uri+"/recherche_offre")
     public List<Offre> recherche_Offre(@RequestParam String Idagence,
                                        @RequestParam String Mdpagence,
                                        @RequestParam String date1,
