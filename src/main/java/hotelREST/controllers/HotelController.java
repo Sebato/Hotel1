@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -95,17 +94,35 @@ public class HotelController {
 //    @ResponseStatus(HttpStatus.CREATED)
 
     //GENERATION D'OFFRES EN ACCORD AVEC LA RECHERCHE
+//    @PostMapping(uri+"/recherche_offre")
+//    public List<Offre> recherche_Offre(@RequestParam String Idagence,
+//                                       @RequestParam String Mdpagence,
+//                                       @RequestParam String date1,
+//                                       @RequestParam String date2,
+//                                       @RequestParam String nbClients)
+//            throws PartenaireNotFoundException, ParseException, WrongCredentialsException {
+//
+//        Hotel hotel = repository.findAll().get(0);
+//        List<Offre> offresGen;
+//        offresGen = hotel.getOffres(Idagence, Mdpagence, date1, date2, Integer.parseInt(nbClients));
+//        repository.save(hotel);
+//
+//        System.err.println("\nrepository saved\n");
+//
+//        return offresGen;
+//    }
+
     @PostMapping(uri+"/recherche_offre")
-    public List<Offre> recherche_Offre(@RequestParam String Idagence,
-                                       @RequestParam String Mdpagence,
-                                       @RequestParam String date1,
-                                       @RequestParam String date2,
-                                       @RequestParam int nbClients)
+    public ResponseOffers recherche_Offre(@RequestBody PostSearchBody search)
             throws PartenaireNotFoundException, ParseException, WrongCredentialsException {
 
         Hotel hotel = repository.findAll().get(0);
-        List<Offre> offresGen;
-        offresGen = hotel.getOffres(Idagence, Mdpagence, date1, date2, nbClients);
+        ResponseOffers offresGen = new ResponseOffers(
+                hotel.getOffres(search.getIdagence(),
+                search.getMdpagence(),
+                search.getDate1(),
+                search.getDate2(),
+                Integer.parseInt(search.getNbClient())));
         repository.save(hotel);
 
         System.err.println("\nrepository saved\n");

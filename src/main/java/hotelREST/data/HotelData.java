@@ -35,9 +35,9 @@ public class HotelData {
             h1.addChambre(c3);
             h1.addChambre(c4);
 
-            Partenaire p1 = new Partenaire("A0", "Partenaire1", 0.5f);
-            Partenaire p2 = new Partenaire("A1", "Partenaire2", 0.4f);
-            Partenaire p3 = new Partenaire("A2", "Partenaire3", 0.3f);
+            Partenaire p1 = new Partenaire("A0", "Partenaire1", 0.80f);
+            Partenaire p2 = new Partenaire("A1", "Partenaire2", 0.92f);
+            Partenaire p3 = new Partenaire("A2", "Partenaire3", 0.75f);
 
             h1.addPartenaire(p1);
             h1.addPartenaire(p2);

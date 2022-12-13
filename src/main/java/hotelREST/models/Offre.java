@@ -11,6 +11,9 @@ public class Offre {
 
     @Id
     private long id;
+    
+    private int publicID;
+    
     private String idPartenaire;
     @ManyToOne
     private Chambre chambre;
@@ -37,6 +40,7 @@ public class Offre {
 
     public Offre(long OffreID, String idPartenaire, Chambre chambre, String d1, String d2, float prix, int nbPersonnes){
         this.id = OffreID;
+        this.publicID = (int) OffreID; //TODO: point à améliorer
         this.idPartenaire = idPartenaire;
         this.chambre = chambre;
         this.d1 = d1;
@@ -51,6 +55,13 @@ public class Offre {
         return id;
     }
 
+    public int getpublicID() {
+        return publicID;
+    }
+
+    public void setpublicID(int publicID) {
+        this.publicID = publicID;
+    }
     public float getPrix() {
         return prix;
     }

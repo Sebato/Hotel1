@@ -21,7 +21,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 public class HotelRestDemoApplication {
     public static void main(String[] args) {
         SpringApplication.run(hotelREST.main.HotelRestDemoApplication.class, args);
-
+        System.out.println("Hotel Service online; Uri : http://localhost:8080/hotelservice/api");
     }
 
 }
